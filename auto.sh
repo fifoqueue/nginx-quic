@@ -102,7 +102,7 @@ if [ "$CACHE_PURGE" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./l
 if [ "$SSL_FINGERPRINT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-ssl-fingerprint"; fi
 
 auto/configure \
---with-cc-opt="-Wno-stringop-truncation -DTCP_FASTOPEN=23 ${BUILD_BIT}${BUILD_LTO} ${TEMP_OPT} -g -O3 -march=native -fstack-protector-strong -fuse-ld=gold -fuse-linker-plugin --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wno-strict-aliasing -Wp,-D_FORTIFY_SOURCE=2 -gsplit-dwarf -I./lib/boringssl/include -DNGX_HTTP_HEADERS" \
+--with-cc-opt="-Wno-stringop-truncation -DTCP_FASTOPEN=23 ${BUILD_BIT}${BUILD_LTO} ${TEMP_OPT} -g -O3 -march=native -fstack-protector-strong -fuse-ld=gold -fuse-linker-plugin --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wno-strict-aliasing -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -gsplit-dwarf -I./lib/boringssl/include -DNGX_HTTP_HEADERS" \
 --with-ld-opt="${BUILD_LD} ${BUILD_LTO} -L./lib/boringssl/build/ssl -L./lib/boringssl/build/crypto -lstdc++" \
 --builddir=objs --prefix=${NGX_PREFIX} \
 --conf-path=${NGX_CONF} \
