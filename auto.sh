@@ -30,7 +30,7 @@ rm -f ${NGX_SBIN_PATH}.old
 BUILD_MTS="-j$(expr $(nproc) \+ 1)"
 
 ### Submodule update
-git submodule update --init --recursive --force "$NGX_SUBMODULE" || exit 1
+git submodule update --init --recursive --force || exit 1
 
 ### OpenSSL source checkout
 git -C lib/openssl fetch --tags --force origin || exit 1
