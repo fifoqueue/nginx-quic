@@ -48,6 +48,17 @@ git -C lib/openssl remote set-url origin https://github.com/openssl/openssl.git 
 git -C lib/openssl fetch --tags --force origin || exit 1
 git -C lib/openssl checkout --force "$OPENSSL_VERSION" || exit 1
 
+### LTO Build
+if [ "$LTO" = 1 ]; then
+    BUILD_LTO="-flto -ffat-lto-objects"
+    BUILD_OPENSSL_LTO="-flto -ffat-lto-objects"
+else
+    BUILD_LTO=""
+    BUILD_OPENSSL_LTO=""
+fi
+
+BUILD_OPENSSL_OPT="no-tests no-makedepend ${BUILD_OPENSSL_LTO}"
+
 ### nginx-ssl-fingerprint patches
 OPENSSL_PATCH_FILE="lib/nginx-ssl-fingerprint/patches/${OPENSSL_VERSION}.patch"
 
@@ -69,6 +80,24 @@ if [ "$SSL_FINGERPRINT" = 1 ]; then
         fi
         patch -d lib/openssl -p1 < "$OPENSSL_PATCH_FILE" || exit 1
     fi
+fi
+
+### OpenSSL build
+case ./lib/openssl in
+    /*) OPENSSL_PREFIX="./lib/openssl/.openssl" ;;
+    *)  OPENSSL_PREFIX="$PWD/lib/openssl/.openssl" ;;
+esac
+
+if [ ! -f "lib/openssl/.openssl/include/openssl/ssl.h" ]; then
+    (
+        cd lib/openssl || exit 1
+        if [ -f Makefile ]; then
+            make clean || exit 1
+        fi
+        ./config --prefix="$OPENSSL_PREFIX" no-shared no-threads $BUILD_OPENSSL_OPT || exit 1
+        make $BUILD_MTS || make $BUILD_MTS || exit 1
+        make install_sw LIBDIR=lib || exit 1
+    ) || exit 1
 fi
 
 ### PCRE reconf
@@ -112,17 +141,6 @@ else
     BUILD_ZLIB="./lib/zlib-ng"
     BUILD_LD=""
 fi
-
-### LTO Build
-if [ "$LTO" = 1 ]; then
-    BUILD_LTO="-flto -ffat-lto-objects"
-    BUILD_OPENSSL_LTO="-flto -ffat-lto-objects"
-else
-    BUILD_LTO=""
-    BUILD_OPENSSL_LTO=""
-fi
-
-BUILD_OPENSSL_OPT="no-tests no-makedepend ${BUILD_OPENSSL_LTO}"
 
 ### Temporary Ubuntu/Debian build error (libxslt/libxml2)
 ### URL : https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=721602
