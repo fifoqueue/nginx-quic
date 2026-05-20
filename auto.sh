@@ -30,30 +30,7 @@ rm -f ${NGX_SBIN_PATH}.old
 BUILD_MTS="-j$(expr $(nproc) \+ 1)"
 
 ### Submodule update
-NGX_SUBMODULES="
-lib/headers-more-nginx-module
-lib/nginx-dav-ext-module
-lib/ngx_devel_kit
-lib/ngx-fancyindex
-lib/openssl
-lib/ngx_http_geoip2_module
-lib/nginx-module-vts
-lib/nginx-http-flv-module
-lib/ngx_brotli
-lib/pcre
-lib/naxsi
-lib/zstd-nginx-module
-lib/zlib-ng
-lib/ngx_dynamic_etag
-lib/ngx_cache_purge
-lib/nginx-ssl-fingerprint
-"
-
-git submodule sync --recursive || exit 1
-
-for NGX_SUBMODULE in $NGX_SUBMODULES; do
-    git submodule update --init --recursive --force "$NGX_SUBMODULE" || exit 1
-done
+git submodule update --init --recursive --force "$NGX_SUBMODULE" || exit 1
 
 ### OpenSSL source checkout
 git -C lib/openssl fetch --tags --force origin || exit 1
