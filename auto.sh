@@ -91,7 +91,7 @@ TEMP_OPT="-lm"
 ### Module check
 if [ "$PAGESPEED" = 1 ]; then BUILD_MODULES="--add-module=./lib/pagespeed ${PS_NGX_EXTRA_FLAGS}"; fi
 if [ "$FLV" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-http-flv-module"; fi
-#if [ "$NAXSI" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/naxsi/naxsi_src"; fi
+if [ "$NAXSI" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/naxsi/naxsi_src"; fi
 if [ "$DAV_EXT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-dav-ext-module"; fi
 if [ "$FANCYINDEX" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx-fancyindex"; fi
 if [ "$GEOIP2" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx_http_geoip2_module"; fi
