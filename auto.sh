@@ -88,7 +88,9 @@ case ./lib/openssl in
     *)  OPENSSL_PREFIX="$PWD/lib/openssl/.openssl" ;;
 esac
 
-if [ ! -f "lib/openssl/.openssl/include/openssl/ssl.h" ]; then
+if [ ! -f "lib/openssl/.openssl/include/openssl/ssl.h" ] \
+    || [ ! -f "lib/openssl/.openssl/lib/libssl.a" ] \
+    || [ ! -f "lib/openssl/.openssl/lib/libcrypto.a" ]; then
     (
         cd lib/openssl || exit 1
         if [ -f Makefile ]; then
@@ -216,6 +218,14 @@ auto/configure \
 --add-module=./lib/ngx_brotli \
 --add-module=./lib/headers-more-nginx-module \
 ${BUILD_MODULES}
+
+### OpenSSL has already been built above.
+### Keep nginx's OpenSSL make target newer than the generated Makefile.
+if [ ! -f "lib/openssl/.openssl/include/openssl/ssl.h" ]; then
+    echo "OpenSSL install header not found: lib/openssl/.openssl/include/openssl/ssl.h"
+    exit 1
+fi
+touch lib/openssl/.openssl/include/openssl/ssl.h || exit 1
 
 ### SERVER HEADER CONFIG
 NGX_AUTO_CONFIG_H="objs/ngx_auto_config.h";have="NGINX_SERVER";value="\"${SERVER_HEADER}\""; . auto/define
