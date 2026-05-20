@@ -131,7 +131,10 @@ TEMP_OPT="-lm"
 ### Module check
 if [ "$PAGESPEED" = 1 ]; then BUILD_MODULES="--add-module=./lib/pagespeed ${PS_NGX_EXTRA_FLAGS}"; fi
 if [ "$FLV" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-http-flv-module"; fi
-if [ "$NAXSI" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/naxsi/naxsi_src"; fi
+if [ "$NAXSI" = 1 ]; then
+    BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/naxsi/naxsi_src"
+    BUILD_NAXSI_CC_OPT="-Wno-enum-int-mismatch -Wno-unused-function"
+fi
 if [ "$DAV_EXT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-dav-ext-module"; fi
 if [ "$FANCYINDEX" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx-fancyindex"; fi
 if [ "$GEOIP2" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx_http_geoip2_module"; fi
@@ -142,7 +145,7 @@ if [ "$CACHE_PURGE" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./l
 if [ "$SSL_FINGERPRINT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-ssl-fingerprint"; fi
 
 auto/configure \
---with-cc-opt="-Wno-stringop-truncation -DTCP_FASTOPEN=23 ${BUILD_BIT}${BUILD_LTO} ${TEMP_OPT} -g -O3 -march=native -fstack-protector-strong -fuse-ld=gold -fuse-linker-plugin --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wno-strict-aliasing -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -gsplit-dwarf -DNGX_HTTP_HEADERS" \
+--with-cc-opt="-Wno-stringop-truncation ${BUILD_NAXSI_CC_OPT} -DTCP_FASTOPEN=23 ${BUILD_BIT}${BUILD_LTO} ${TEMP_OPT} -g -O3 -march=native -fstack-protector-strong -fuse-ld=gold -fuse-linker-plugin --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wno-strict-aliasing -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -gsplit-dwarf -DNGX_HTTP_HEADERS" \
 --with-ld-opt="${BUILD_LD} ${BUILD_LTO}" \
 --builddir=objs --prefix=${NGX_PREFIX} \
 --conf-path=${NGX_CONF} \
