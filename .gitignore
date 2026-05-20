@@ -1,0 +1,38 @@
+# Config file
+config.inc
+
+# Not needed
+/.hg
+/patches
+
+# Patch ignore
+*~
+*.orig
+*.rej
+*.patch
+
+# Build files
+/objs
+.openssl
+*.obj
+*.o
+*.a
+*.so
+*.suo
+*.lib
+*.bak
+*.dwo
+Makefile
+
+# Log files
+*.log
+
+# ETC.
+autopatch.sh
+autoclear.sh
+submodule.sh
+my.sh
+
+# IntelliJ
+.idea/
+*.iml

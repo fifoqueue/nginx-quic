@@ -1,0 +1,51 @@
+[submodule "lib/headers-more-nginx-module"]
+	path = lib/headers-more-nginx-module
+	url = https://github.com/openresty/headers-more-nginx-module.git
+[submodule "lib/nginx-dav-ext-module"]
+	path = lib/nginx-dav-ext-module
+	url = https://github.com/arut/nginx-dav-ext-module.git
+[submodule "lib/ngx_devel_kit"]
+	path = lib/ngx_devel_kit
+	url = https://github.com/simplresty/ngx_devel_kit.git
+[submodule "lib/ngx-fancyindex"]
+	path = lib/ngx-fancyindex
+	url = https://github.com/aperezdc/ngx-fancyindex.git
+[submodule "lib/openssl"]
+	path = lib/openssl
+	url = https://github.com/hakasenyang/openssl-custom.git
+[submodule "lib/ngx_http_geoip2_module"]
+	path = lib/ngx_http_geoip2_module
+	url = https://github.com/leev/ngx_http_geoip2_module.git
+[submodule "lib/nginx-module-vts"]
+	path = lib/nginx-module-vts
+	url = https://github.com/vozlt/nginx-module-vts
+[submodule "lib/nginx-http-flv-module"]
+	path = lib/nginx-http-flv-module
+	url = https://github.com/winshining/nginx-http-flv-module.git
+[submodule "lib/ngx_brotli"]
+	path = lib/ngx_brotli
+	url = https://github.com/google/ngx_brotli.git
+[submodule "lib/boringssl"]
+	path = lib/boringssl
+	url = https://boringssl.googlesource.com/boringssl
+[submodule "lib/pcre"]
+	path = lib/pcre
+	url = https://github.com/PCRE2Project/pcre2.git
+[submodule "lib/naxsi"]
+	path = lib/naxsi
+	url = https://github.com/wargio/naxsi.git
+[submodule "lib/zstd-nginx-module"]
+	path = lib/zstd-nginx-module
+	url = https://github.com/tokers/zstd-nginx-module
+[submodule "lib/zlib-ng"]
+	path = lib/zlib-ng
+	url = https://github.com/zlib-ng/zlib-ng
+[submodule "lib/ngx_dynamic_etag"]
+	path = lib/ngx_dynamic_etag
+	url = https://github.com/dvershinin/ngx_dynamic_etag
+[submodule "lib/ngx_cache_purge"]
+	path = lib/ngx_cache_purge
+	url = https://github.com/nginx-modules/ngx_cache_purge
+[submodule "lib/nginx-ssl-fingerprint"]
+	path = lib/nginx-ssl-fingerprint
+	url = https://github.com/hnakamur/nginx-ssl-fingerprint.git
