@@ -17,8 +17,6 @@
 
 #define NGX_HTTP_V2_STATE_BUFFER_SIZE    16
 
-#define NGX_FP_V2_BUFFER_SIZE            32
-
 #define NGX_HTTP_V2_DEFAULT_FRAME_SIZE   (1 << 14)
 #define NGX_HTTP_V2_MAX_FRAME_SIZE       ((1 << 24) - 1)
 
@@ -131,12 +129,6 @@ typedef struct {
 } ngx_http_v2_hpack_t;
 
 
-typedef struct {
-    u_char                           data[NGX_FP_V2_BUFFER_SIZE];
-    size_t                           len;
-} ngx_http_v2_fp_fixed_str_t;
-
-
 #if (NGX_HTTP_V2_HPACK_ENC)
 typedef struct {
     uint64_t                         hash_val;
@@ -227,13 +219,6 @@ struct ngx_http_v2_connection_s {
     unsigned                         blocked:1;
     unsigned                         goaway:1;
     unsigned                         indicate_resize:1;
-    unsigned                         fp_fingerprinted:1;
-
-    ngx_http_v2_fp_fixed_str_t       fp_settings;
-    ngx_http_v2_fp_fixed_str_t       fp_priorities;
-    ngx_http_v2_fp_fixed_str_t       fp_pseudoheaders;
-    ngx_uint_t                       fp_windowupdate;
-    ngx_str_t                        fp_str;
 
 #if (NGX_HTTP_V2_HPACK_ENC)
     ngx_http_v2_hpack_enc_t          hpack_enc;

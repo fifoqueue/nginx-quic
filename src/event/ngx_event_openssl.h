@@ -160,17 +160,6 @@ struct ngx_ssl_connection_s {
     unsigned                    write_blocked:1;
     unsigned                    sni_accepted:1;
 
-    ngx_str_t                   fp_ja3_data;
-    ngx_str_t                   fp_ja3_str;
-    ngx_str_t                   fp_ja3_hash;
-    uint16_t                    fp_tls_greased;
-
-    ngx_str_t                   fp_ja4_data;
-    ngx_str_t                   fp_ja4_r;
-    ngx_str_t                   fp_ja4;
-    ngx_str_t                   fp_ja4_ro;
-    ngx_str_t                   fp_ja4_o;
-
     ngx_ssl_dyn_rec_t           dyn_rec;
     ngx_msec_t                  dyn_rec_last_write;
     ngx_uint_t                  dyn_rec_records_sent;

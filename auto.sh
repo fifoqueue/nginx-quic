@@ -20,6 +20,8 @@ if [ ! "$NGX_LIB" ]; then NGX_LIB="/var/lib/nginx"; fi
 if [ ! "$NGX_LOG" ]; then NGX_LOG="/var/log/nginx"; fi
 if [ ! "$NGX_PID" ]; then NGX_PID="/var/run/nginx.pid"; fi
 if [ ! "$NGX_LOCK" ]; then NGX_LOCK="/var/lock/nginx.lock"; fi
+if [ ! "$NGINX_PATCH_VERSION" ]; then NGINX_PATCH_VERSION="release-1.30.0"; fi
+if [ ! "$OPENSSL_VERSION" ]; then OPENSSL_VERSION="openssl-3.6.2"; fi
 
 ### Remove Old file
 rm -f ${NGX_SBIN_PATH}.old
@@ -27,11 +29,58 @@ rm -f ${NGX_SBIN_PATH}.old
 ### Multithread build
 BUILD_MTS="-j$(expr $(nproc) \+ 1)"
 
-git submodule update --init --recursive --force
+### Submodule update
+NGX_SUBMODULES="
+lib/headers-more-nginx-module
+lib/nginx-dav-ext-module
+lib/ngx_devel_kit
+lib/ngx-fancyindex
+lib/openssl
+lib/ngx_http_geoip2_module
+lib/nginx-module-vts
+lib/nginx-http-flv-module
+lib/ngx_brotli
+lib/pcre
+lib/naxsi
+lib/zstd-nginx-module
+lib/zlib-ng
+lib/ngx_dynamic_etag
+lib/ngx_cache_purge
+lib/nginx-ssl-fingerprint
+"
 
-### BoringSSL Build......
-cd lib/boringssl && mkdir -p build && cd build && \
-cmake -GNinja .. && ninja && cd ../../../
+git submodule sync --recursive || exit 1
+
+for NGX_SUBMODULE in $NGX_SUBMODULES; do
+    git submodule update --init --recursive --force "$NGX_SUBMODULE" || exit 1
+done
+
+### OpenSSL source checkout
+git -C lib/openssl fetch --tags --force origin || exit 1
+git -C lib/openssl checkout --force "$OPENSSL_VERSION" || exit 1
+
+### nginx-ssl-fingerprint patches
+OPENSSL_PATCH_FILE="lib/nginx-ssl-fingerprint/patches/${OPENSSL_VERSION}.patch"
+
+if [ "$SSL_FINGERPRINT" = 1 ]; then
+    NGINX_PATCH_FILE="lib/nginx-ssl-fingerprint/patches/${NGINX_PATCH_VERSION}.patch"
+
+    if ! grep -q "fp_ja_data" "src/event/ngx_event_openssl.h"; then
+        if [ ! -f "$NGINX_PATCH_FILE" ]; then
+            echo "nginx patch file not found: $NGINX_PATCH_FILE"
+            exit 1
+        fi
+        patch --forward --fuzz=3 -d . -p1 < "$NGINX_PATCH_FILE" || exit 1
+    fi
+
+    if ! grep -q "SSL_client_hello_get_ja_data" "lib/openssl/include/openssl/ssl.h.in"; then
+        if [ ! -f "$OPENSSL_PATCH_FILE" ]; then
+            echo "OpenSSL patch file not found: $OPENSSL_PATCH_FILE"
+            exit 1
+        fi
+        patch -d lib/openssl -p1 < "$OPENSSL_PATCH_FILE" || exit 1
+    fi
+fi
 
 ### PCRE reconf
 if [ ! -f "lib/pcre/configure" ]; then
@@ -84,6 +133,8 @@ else
     BUILD_OPENSSL_LTO=""
 fi
 
+BUILD_OPENSSL_OPT="no-tests no-makedepend ${BUILD_OPENSSL_LTO}"
+
 ### Temporary Ubuntu/Debian build error (libxslt/libxml2)
 ### URL : https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=721602
 TEMP_OPT="-lm"
@@ -102,8 +153,8 @@ if [ "$CACHE_PURGE" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./l
 if [ "$SSL_FINGERPRINT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-ssl-fingerprint"; fi
 
 auto/configure \
---with-cc-opt="-Wno-stringop-truncation -DTCP_FASTOPEN=23 ${BUILD_BIT}${BUILD_LTO} ${TEMP_OPT} -g -O3 -march=native -fstack-protector-strong -fuse-ld=gold -fuse-linker-plugin --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wno-strict-aliasing -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -gsplit-dwarf -I./lib/boringssl/include -DNGX_HTTP_HEADERS" \
---with-ld-opt="${BUILD_LD} ${BUILD_LTO} -L./lib/boringssl/build/ssl -L./lib/boringssl/build/crypto -lstdc++" \
+--with-cc-opt="-Wno-stringop-truncation -DTCP_FASTOPEN=23 ${BUILD_BIT}${BUILD_LTO} ${TEMP_OPT} -g -O3 -march=native -fstack-protector-strong -fuse-ld=gold -fuse-linker-plugin --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wno-strict-aliasing -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -gsplit-dwarf -DNGX_HTTP_HEADERS" \
+--with-ld-opt="${BUILD_LD} ${BUILD_LTO}" \
 --builddir=objs --prefix=${NGX_PREFIX} \
 --conf-path=${NGX_CONF} \
 --pid-path=${NGX_PID} \
@@ -119,6 +170,8 @@ auto/configure \
 --with-pcre=./lib/pcre \
 --with-pcre-jit \
 --with-zlib=${BUILD_ZLIB} \
+--with-openssl=./lib/openssl \
+--with-openssl-opt="${BUILD_OPENSSL_OPT}" \
 --with-http_realip_module \
 --with-http_addition_module \
 --with-http_sub_module \
@@ -153,11 +206,6 @@ auto/configure \
 --add-module=./lib/ngx_brotli \
 --add-module=./lib/headers-more-nginx-module \
 ${BUILD_MODULES}
-
-
-### OpenSSL Skip
-### Do not use it for the FIRST BUILD.
-#touch lib/openssl/.openssl/include/openssl/ssl.h
 
 ### SERVER HEADER CONFIG
 NGX_AUTO_CONFIG_H="objs/ngx_auto_config.h";have="NGINX_SERVER";value="\"${SERVER_HEADER}\""; . auto/define

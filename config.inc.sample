@@ -23,6 +23,12 @@ BUILD_MTS="-j$(expr $(nproc) \+ 1)"
 ### View : https://gcc.gnu.org/wiki/LinkTimeOptimization#Using_LTO
 LTO=0
 
+### nginx core patch tag from nginx-ssl-fingerprint/patches
+NGINX_PATCH_VERSION="release-1.30.0"
+
+### OpenSSL source tag
+OPENSSL_VERSION="openssl-3.6.2"
+
 #########################
 ### Select add module ###
 #########################

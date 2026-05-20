@@ -11,10 +11,12 @@ Original: [nginx](https://github.com/nginx/nginx)
 4. Cloudflare HPACK Patch 적용
 5. SSL Dynamic 적용
 6. JA3/JA4 SSL fingerprint 변수 지원 (`SSL_FINGERPRINT=1`)
+7. nginx-ssl-fingerprint용 nginx core/OpenSSL patch 자동 적용
+8. OpenSSL 3.6.2 정적 빌드
 
 ## 미지원
 
-1. Hybrid 인증서 미지원 (현재 BoringSSL 기능상 지원하지 않음)
+1. Hybrid 인증서 지원 여부 미검증
 2. OLD CHACHA20-POLY1305 미지원 (더 이상 쓸 일이 없음)
 3. strict_sni 기능은 nginx 자체 기능에서 지원되므로 추가 지원 X
   - listen ssl 에 default_server 서버를 하나 만든 뒤에 ssl_reject_handshake on; 을 추가하세요.
@@ -26,7 +28,7 @@ Original: [nginx](https://github.com/nginx/nginx)
 ## Debian/Ubuntu 기반
 
 ```
-apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev g++ curl golang libunwind-dev ninja-build libzstd-dev cmake
+apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev g++ curl golang libunwind-dev ninja-build libzstd-dev cmake patch
 ```
 
 ## RHEL 9
@@ -34,5 +36,5 @@ apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip au
 ```
 dnf install epel-release -y
 dnf config-manager --set-enabled crb
-dnf install automake cmake ninja-build golang gcc-c++ libtool libunwind-devel libxml2-devel libxslt-devel gd-devel jemalloc-devel libatomic_ops-devel libmaxminddb-devel libzstd-devel
+dnf install automake cmake ninja-build golang gcc-c++ libtool libunwind-devel libxml2-devel libxslt-devel gd-devel jemalloc-devel libatomic_ops-devel libmaxminddb-devel libzstd-devel patch
 ```
