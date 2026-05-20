@@ -255,6 +255,21 @@ make $BUILD_MTS install
 ### Make directory NGX_LIB
 mkdir -p ${NGX_LIB}
 
+### Lua
+if [ "$LUA" = 1 ]; then
+  mkdir -p ${NGX_PREFIX}/lua
+
+  git clone https://github.com/openresty/lua-resty-core.git
+  cd lua-resty-core
+  sudo make install LUA_LIB_DIR=/usr/local/share/lua/5.1
+  cd ..
+
+  git clone https://github.com/openresty/lua-resty-lrucache.git
+  cd lua-resty-lrucache
+  sudo make install LUA_LIB_DIR=/usr/local/share/lua/5.1
+  cd ..
+fi
+
 ### Check for old files
 if [ -f "${NGX_SBIN_PATH}.old" ]; then
     ### Test nginx configuration.
