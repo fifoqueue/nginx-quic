@@ -33,6 +33,17 @@ BUILD_MTS="-j$(expr $(nproc) \+ 1)"
 git submodule update --init --recursive --force || exit 1
 
 ### OpenSSL source checkout
+if ! git -C lib/openssl rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    if [ -e "lib/openssl" ]; then
+        echo "lib/openssl exists but is not a git checkout."
+        echo "Remove it or initialize it with https://github.com/openssl/openssl.git."
+        exit 1
+    fi
+
+    git clone https://github.com/openssl/openssl.git lib/openssl || exit 1
+fi
+
+git -C lib/openssl remote set-url origin https://github.com/openssl/openssl.git || exit 1
 git -C lib/openssl fetch --tags --force origin || exit 1
 git -C lib/openssl checkout --force "$OPENSSL_VERSION" || exit 1
 
