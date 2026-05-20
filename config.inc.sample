@@ -36,10 +36,17 @@ OPENSSL_VERSION="openssl-3.6.2"
 ### Enter 0 for the module that is not to be used.
 
 ### nginx-http-flv-module
-FLV=0
+FLV=1
+
+### OpenResty lua-nginx-module
+LUA=1
+
+### LuaJIT paths for lua-nginx-module
+LUAJIT_INC="/usr/include/luajit-2.1"
+LUAJIT_LIB="/usr/lib/x86_64-linux-gnu"
 
 ### naxsi
-NAXSI=0
+NAXSI=1
 
 ### nginx-dav-ext-module
 DAV_EXT=1
@@ -51,7 +58,7 @@ FANCYINDEX=1
 GEOIP2=1
 
 ### nginx-module-vts
-VTS=0
+VTS=1
 
 ### zstd-nginx-module
 ZSTD=1

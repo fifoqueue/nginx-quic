@@ -151,6 +151,25 @@ TEMP_OPT="-lm"
 ### Module check
 if [ "$PAGESPEED" = 1 ]; then BUILD_MODULES="--add-module=./lib/pagespeed ${PS_NGX_EXTRA_FLAGS}"; fi
 if [ "$FLV" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-http-flv-module"; fi
+if [ "$LUA" = 1 ]; then
+    if [ ! "$LUAJIT_INC" ]; then
+        if [ -d "/usr/include/luajit-2.1" ]; then
+            LUAJIT_INC="/usr/include/luajit-2.1"
+        else
+            LUAJIT_INC="/usr/include/luajit-2.0"
+        fi
+    fi
+    if [ ! "$LUAJIT_LIB" ]; then
+        if [ -d "/usr/lib64" ]; then
+            LUAJIT_LIB="/usr/lib64"
+        else
+            LUAJIT_LIB="/usr/lib/x86_64-linux-gnu"
+        fi
+    fi
+    export LUAJIT_INC LUAJIT_LIB
+    BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/lua-nginx-module"
+    BUILD_LUA_LD_OPT="-L${LUAJIT_LIB} -Wl,-rpath,${LUAJIT_LIB}"
+fi
 if [ "$NAXSI" = 1 ]; then
     BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/naxsi/naxsi_src"
     BUILD_NAXSI_CC_OPT="-Wno-enum-int-mismatch -Wno-unused-function"
@@ -166,7 +185,7 @@ if [ "$SSL_FINGERPRINT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module
 
 auto/configure \
 --with-cc-opt="-Wno-stringop-truncation ${BUILD_NAXSI_CC_OPT} -DTCP_FASTOPEN=23 ${BUILD_BIT}${BUILD_LTO} ${TEMP_OPT} -g -O3 -march=native -fstack-protector-strong -fuse-ld=gold -fuse-linker-plugin --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wno-strict-aliasing -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -gsplit-dwarf -DNGX_HTTP_HEADERS" \
---with-ld-opt="${BUILD_LD} ${BUILD_LTO}" \
+--with-ld-opt="${BUILD_LD} ${BUILD_LTO} ${BUILD_LUA_LD_OPT}" \
 --builddir=objs --prefix=${NGX_PREFIX} \
 --conf-path=${NGX_CONF} \
 --pid-path=${NGX_PID} \

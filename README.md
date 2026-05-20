@@ -13,6 +13,7 @@ Original: [nginx](https://github.com/nginx/nginx)
 6. JA3/JA4 SSL fingerprint 변수 지원 (`SSL_FINGERPRINT=1`)
 7. nginx-ssl-fingerprint용 nginx core/OpenSSL patch 자동 적용
 8. OpenSSL 3.6.2 정적 빌드
+9. OpenResty lua-nginx-module 지원 (`LUA=1`)
 
 ## 미지원
 
@@ -28,7 +29,7 @@ Original: [nginx](https://github.com/nginx/nginx)
 ## Debian/Ubuntu 기반
 
 ```
-apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev g++ curl golang libunwind-dev ninja-build libzstd-dev cmake patch
+apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev g++ curl golang libunwind-dev ninja-build libzstd-dev cmake patch libluajit-5.1-dev
 ```
 
 ## RHEL 9
@@ -36,5 +37,5 @@ apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip au
 ```
 dnf install epel-release -y
 dnf config-manager --set-enabled crb
-dnf install automake cmake ninja-build golang gcc-c++ libtool libunwind-devel libxml2-devel libxslt-devel gd-devel jemalloc-devel libatomic_ops-devel libmaxminddb-devel libzstd-devel patch
+dnf install automake cmake ninja-build golang gcc-c++ libtool libunwind-devel libxml2-devel libxslt-devel gd-devel jemalloc-devel libatomic_ops-devel libmaxminddb-devel libzstd-devel patch luajit-devel
 ```
