@@ -257,8 +257,6 @@ mkdir -p ${NGX_LIB}
 
 ### Lua
 if [ "$LUA" = 1 ]; then
-  mkdir -p ${NGX_PREFIX}/lua
-
   git clone https://github.com/openresty/lua-resty-core.git
   cd lua-resty-core
   sudo make install LUA_LIB_DIR=/usr/local/share/lua/5.1
