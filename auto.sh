@@ -272,7 +272,7 @@ if [ "$LUA" = 1 ]; then
 
     (
       cd "${RESTY_TMP_DIR}/${RESTY_DIR}" || exit 1
-      sudo make install LUA_LIB_DIR="${LUA_LIB_DIR}"
+      make install LUA_LIB_DIR="${LUA_LIB_DIR}"
     ) || {
       rm -rf "${RESTY_TMP_DIR}"
       exit 1
