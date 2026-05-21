@@ -151,6 +151,7 @@ TEMP_OPT="-lm"
 ### Module check
 if [ "$PAGESPEED" = 1 ]; then BUILD_MODULES="--add-module=./lib/pagespeed ${PS_NGX_EXTRA_FLAGS}"; fi
 if [ "$FLV" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-http-flv-module"; fi
+if [ "$RTMP" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-rtmp-module"; fi
 if [ "$LUA" = 1 ]; then
     if [ ! "$LUAJIT_INC" ]; then
         if [ -d "/usr/include/luajit-2.1" ]; then
@@ -257,15 +258,67 @@ mkdir -p ${NGX_LIB}
 
 ### Lua
 if [ "$LUA" = 1 ]; then
-  git clone https://github.com/openresty/lua-resty-core.git
-  cd lua-resty-core
-  sudo make install LUA_LIB_DIR=/usr/local/share/lua/5.1
-  cd ..
+  if [ ! "$LUA_LIB_DIR" ]; then LUA_LIB_DIR="/usr/local/share/lua/5.1"; fi
 
-  git clone https://github.com/openresty/lua-resty-lrucache.git
-  cd lua-resty-lrucache
-  sudo make install LUA_LIB_DIR=/usr/local/share/lua/5.1
-  cd ..
+  install_lua_resty_module() {
+    RESTY_REPO="$1"
+    RESTY_DIR="$2"
+    RESTY_TMP_DIR=$(mktemp -d) || exit 1
+
+    git clone "$RESTY_REPO" "${RESTY_TMP_DIR}/${RESTY_DIR}" || {
+      rm -rf "${RESTY_TMP_DIR}"
+      exit 1
+    }
+
+    (
+      cd "${RESTY_TMP_DIR}/${RESTY_DIR}" || exit 1
+      sudo make install LUA_LIB_DIR="${LUA_LIB_DIR}"
+    ) || {
+      rm -rf "${RESTY_TMP_DIR}"
+      exit 1
+    }
+
+    rm -rf "${RESTY_TMP_DIR}"
+  }
+
+  if [ ! -f "${LUA_LIB_DIR}/resty/core.lua" ]; then
+    install_lua_resty_module "https://github.com/openresty/lua-resty-core.git" "lua-resty-core"
+  fi
+
+  if [ ! -f "${LUA_LIB_DIR}/resty/lrucache.lua" ]; then
+    install_lua_resty_module "https://github.com/openresty/lua-resty-lrucache.git" "lua-resty-lrucache"
+  fi
+fi
+
+### systemd service
+if [ ! -f "/lib/systemd/system/nginx.service" ]; then
+    cat > /lib/systemd/system/nginx.service <<EOF
+[Unit]
+Description=NGINX HTTP and reverse proxy server
+After=syslog.target network.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=${NGX_PID}
+ExecStartPre=${NGX_SBIN_PATH} -t
+ExecStart=${NGX_SBIN_PATH}
+ExecReload=/usr/bin/kill -s HUP \$MAINPID
+ExecStop=/usr/bin/kill -s QUIT \$MAINPID
+# Hardening
+InaccessiblePaths=/etc/shadow /etc/ssh
+ProtectSystem=full
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @mount @obsolete @raw-io
+MemoryDenyWriteExecute=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictRealtime=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    systemctl daemon-reload
+    systemctl enable nginx
 fi
 
 ### Check for old files
