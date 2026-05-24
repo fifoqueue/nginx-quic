@@ -23,6 +23,9 @@ BUILD_MTS="-j$(expr $(nproc) \+ 1)"
 ### View : https://gcc.gnu.org/wiki/LinkTimeOptimization#Using_LTO
 LTO=0
 
+### Debug log support
+DEBUG=0
+
 ### nginx core patch tag from nginx-ssl-fingerprint/patches
 NGINX_PATCH_VERSION="release-1.30.0"
 
@@ -34,6 +37,12 @@ OPENSSL_VERSION="openssl-3.6.2"
 #########################
 
 ### Enter 0 for the module that is not to be used.
+
+### ngx_http_degradation_module
+HTTP_DEGRADATION=1
+
+### ngx_http_perl_module
+PERL=1
 
 ### nginx-http-flv-module
 FLV=1

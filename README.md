@@ -14,6 +14,7 @@ Original: [nginx](https://github.com/nginx/nginx)
 7. nginx-ssl-fingerprint용 nginx core/OpenSSL patch 자동 적용
 8. OpenSSL 3.6.2 정적 빌드
 9. OpenResty lua-nginx-module 지원 (`LUA=1`)
+10. nginx 표준 선택 모듈 추가 활성화 (`HTTP_DEGRADATION=1`, `PERL=1`, select/poll event modules)
 
 ## 미지원
 
@@ -29,7 +30,7 @@ Original: [nginx](https://github.com/nginx/nginx)
 ## Debian/Ubuntu 기반
 
 ```
-apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev g++ curl golang libunwind-dev ninja-build libzstd-dev cmake patch libluajit-5.1-dev
+apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev g++ curl golang libunwind-dev ninja-build libzstd-dev cmake patch libluajit-5.1-dev libperl-dev
 ```
 
 ## RHEL 9
@@ -37,5 +38,5 @@ apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip au
 ```
 dnf install epel-release -y
 dnf config-manager --set-enabled crb
-dnf install automake cmake ninja-build golang gcc-c++ libtool libunwind-devel libxml2-devel libxslt-devel gd-devel jemalloc-devel libatomic_ops-devel libmaxminddb-devel libzstd-devel patch luajit-devel
+dnf install automake cmake ninja-build golang gcc-c++ libtool libunwind-devel libxml2-devel libxslt-devel gd-devel jemalloc-devel libatomic_ops-devel libmaxminddb-devel libzstd-devel patch luajit-devel perl-devel
 ```

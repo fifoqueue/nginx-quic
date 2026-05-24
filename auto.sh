@@ -22,6 +22,9 @@ if [ ! "$NGX_PID" ]; then NGX_PID="/var/run/nginx.pid"; fi
 if [ ! "$NGX_LOCK" ]; then NGX_LOCK="/var/lock/nginx.lock"; fi
 if [ ! "$NGINX_PATCH_VERSION" ]; then NGINX_PATCH_VERSION="release-1.30.0"; fi
 if [ ! "$OPENSSL_VERSION" ]; then OPENSSL_VERSION="openssl-3.6.2"; fi
+if [ ! "$HTTP_DEGRADATION" ]; then HTTP_DEGRADATION=1; fi
+if [ ! "$PERL" ]; then PERL=0; fi
+if [ ! "$DEBUG" ]; then DEBUG=0; fi
 
 ### Remove Old file
 rm -f ${NGX_SBIN_PATH}.old
@@ -148,8 +151,12 @@ fi
 ### URL : https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=721602
 TEMP_OPT="-lm"
 
+### Built-in optional modules
+if [ "$HTTP_DEGRADATION" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --with-http_degradation_module"; fi
+if [ "$PERL" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --with-http_perl_module"; fi
+if [ "$DEBUG" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --with-debug"; fi
+
 ### Module check
-if [ "$PAGESPEED" = 1 ]; then BUILD_MODULES="--add-module=./lib/pagespeed ${PS_NGX_EXTRA_FLAGS}"; fi
 if [ "$FLV" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-http-flv-module"; fi
 if [ "$RTMP" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-rtmp-module"; fi
 if [ "$LUA" = 1 ]; then
@@ -216,10 +223,11 @@ auto/configure \
 --with-http_xslt_module \
 --with-http_gzip_static_module \
 --with-http_auth_request_module \
---with-http_dav_module \
 --with-http_random_index_module \
 --with-http_secure_link_module \
 --with-http_image_filter_module \
+--with-select_module \
+--with-poll_module \
 --with-file-aio \
 --with-threads \
 --with-libatomic \
@@ -310,7 +318,6 @@ ProtectSystem=full
 ProtectKernelTunables=yes
 ProtectControlGroups=yes
 SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @mount @obsolete @raw-io
-MemoryDenyWriteExecute=yes
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 RestrictRealtime=yes
 
