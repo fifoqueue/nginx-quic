@@ -32,23 +32,10 @@ rm -f ${NGX_SBIN_PATH}.old
 ### Multithread build
 BUILD_MTS="-j$(expr $(nproc) \+ 1)"
 
-### Submodule update
-git submodule sync --recursive || exit 1
-git submodule update --init --recursive --remote --force || exit 1
+### Submodule init from recorded gitlinks
+git submodule update --init --recursive || exit 1
 
-### OpenSSL source checkout
-if ! git -C lib/openssl rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    if [ -e "lib/openssl" ]; then
-        echo "lib/openssl exists but is not a git checkout."
-        echo "Remove it or initialize it with https://github.com/openssl/openssl.git."
-        exit 1
-    fi
-
-    git clone https://github.com/openssl/openssl.git lib/openssl || exit 1
-fi
-
-git -C lib/openssl remote set-url origin https://github.com/openssl/openssl.git || exit 1
-git -C lib/openssl fetch --tags --force origin || exit 1
+# OpenSSL checkout
 git -C lib/openssl checkout --force "$OPENSSL_VERSION" || exit 1
 
 ### LTO Build
@@ -118,22 +105,6 @@ if [ -f "lib/zlib-ng/configure" ]; then
     ./configure
     cd ../..
 fi
-
-### ZLIB reconf
-#if [ "$BITCHK" = 64 ]; then
-#    if [ ! -f "lib/zlib/Makefile" ]; then
-#        cd lib/zlib
-#        ./configure --64
-#        cd ../..
-#    fi
-#else
-#    if [ ! -f "lib/zlib_x86/Makefile" ]; then
-#        git submodule add --force https://github.com/madler/zlib.git lib/zlib_x86
-#        cd lib/zlib_x86
-#        ./configure
-#        cd ../..
-#    fi
-#fi
 
 ### x86, x64 Check (Configuration)
 if [ "$BITCHK" = 64 ]; then
