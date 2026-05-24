@@ -23,6 +23,7 @@ config.inc
 *.bak
 *.dwo
 Makefile
+!src/event/quic/bpf/makefile
 
 # Log files
 *.log
