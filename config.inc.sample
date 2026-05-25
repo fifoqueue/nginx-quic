@@ -47,9 +47,6 @@ PERL=1
 ### nginx-http-flv-module
 FLV=1
 
-### nginx-rtmp-module
-RTMP=1
-
 ### OpenResty lua-nginx-module
 LUA=1
 

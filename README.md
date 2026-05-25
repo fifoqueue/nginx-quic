@@ -33,6 +33,8 @@ Original: [nginx](https://github.com/nginx/nginx)
 apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev g++ curl golang libunwind-dev ninja-build libzstd-dev cmake patch libluajit-5.1-dev libperl-dev
 ```
 
+`PERL=1` 로 `ngx_http_perl_module` 을 빌드하려면 `libperl-dev` 가 필요합니다. 설치되어 있지 않으면 링크 단계에서 `cannot find -lperl` 오류가 발생합니다. Perl 모듈이 필요 없으면 `config.inc` 에서 `PERL=0` 으로 비활성화하세요.
+
 ## RHEL 9
 
 ```
@@ -40,3 +42,5 @@ dnf install epel-release -y
 dnf config-manager --set-enabled crb
 dnf install automake cmake ninja-build golang gcc-c++ libtool libunwind-devel libxml2-devel libxslt-devel gd-devel jemalloc-devel libatomic_ops-devel libmaxminddb-devel libzstd-devel patch luajit-devel perl-devel
 ```
+
+`PERL=1` 로 빌드하려면 `perl-devel` 이 필요합니다. Perl 모듈이 필요 없으면 `config.inc` 에서 `PERL=0` 으로 비활성화하세요.

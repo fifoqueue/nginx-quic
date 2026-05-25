@@ -125,6 +125,16 @@ fi
 ### URL : https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=721602
 TEMP_OPT="-lm"
 
+### Module compatibility/dependency checks
+if [ "$PERL" = 1 ]; then
+    if ! perl -MExtUtils::Embed -e ldopts >/dev/null 2>&1 \
+        || ! perl -MConfig -e 'for my $d (split / /, "$Config::Config{archlibexp}/CORE $Config::Config{libpth}") { for my $e (qw(a so dylib)) { exit 0 if -e "$d/libperl.$e" } } exit 1' >/dev/null 2>&1
+    then
+        echo "--- PERL=1 but libperl development files are missing. Disable PERL. ---"
+        PERL=0
+    fi
+fi
+
 ### Built-in optional modules
 if [ "$HTTP_DEGRADATION" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --with-http_degradation_module"; fi
 if [ "$PERL" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --with-http_perl_module"; fi
@@ -132,7 +142,6 @@ if [ "$DEBUG" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --with-debug"; fi
 
 ### Module check
 if [ "$FLV" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-http-flv-module"; fi
-if [ "$RTMP" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-rtmp-module"; fi
 if [ "$LUA" = 1 ]; then
     if [ ! "$LUAJIT_INC" ]; then
         if [ -d "/usr/include/luajit-2.1" ]; then
