@@ -33,6 +33,9 @@ rm -f ${NGX_SBIN_PATH}.old
 BUILD_MTS="-j$(expr $(nproc) \+ 1)"
 
 ### Submodule init from recorded gitlinks
+### OpenSSL may be patched below; force only that submodule back to its
+### recorded state first so repeated runs do not fail on patched files.
+git submodule update --init --recursive --force lib/openssl || exit 1
 git submodule update --init --recursive || exit 1
 
 # OpenSSL checkout
@@ -229,8 +232,11 @@ touch lib/openssl/.openssl/include/openssl/ssl.h || exit 1
 ### SERVER HEADER CONFIG
 NGX_AUTO_CONFIG_H="objs/ngx_auto_config.h";have="NGINX_SERVER";value="\"${SERVER_HEADER}\""; . auto/define
 
-### Install
-make $BUILD_MTS install
+### Build and install
+### Keep install single-threaded so generated PCRE2 headers exist before
+### install_perl_modules is evaluated.
+make $BUILD_MTS || exit 1
+make install || exit 1
 
 ### Make directory NGX_LIB
 mkdir -p ${NGX_LIB}
