@@ -9,7 +9,7 @@ else
 fi
 
 ### If the value is incorrect, convert to normal data.
-if [ ! "$SERVER_HEADER" ]; then SERVER_HEADER="hakase"; fi
+if [ ! "$SERVER_HEADER" ]; then SERVER_HEADER="nginx"; fi
 if [ "$BITCHK" != 32 ] && [ "$BITCHK" != 64 ]; then BITCHK=32; fi
 if [ ! "$LTO" ]; then LTO=0; fi
 if [ ! "$BUILD_MTS" ]; then BUILD_MTS="-j2"; fi
