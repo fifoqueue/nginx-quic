@@ -30,8 +30,10 @@ Original: [nginx](https://github.com/nginx/nginx)
 ## Debian/Ubuntu 기반
 
 ```
-apt install libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev g++ curl golang libunwind-dev ninja-build libzstd-dev cmake patch libluajit-5.1-dev libperl-dev
+apt install build-essential libjemalloc-dev uuid-dev libatomic1 libatomic-ops-dev expat unzip autoconf automake libtool libgd-dev libmaxminddb-dev libxslt1-dev libxml2-dev curl golang libunwind-dev ninja-build libzstd-dev cmake patch libluajit-5.1-dev libperl-dev
 ```
+
+Ubuntu 26.04 LTS / GCC 15 환경에서는 gold 링커가 기본 빌드 도구에서 빠져 있거나 deprecated 패키지로 분리되어 있을 수 있습니다. `auto.sh` 는 기본 링커를 사용하므로 gold 링커를 별도로 설치하지 않아도 됩니다.
 
 `PERL=1` 로 `ngx_http_perl_module` 을 빌드하려면 `libperl-dev` 가 필요합니다. 설치되어 있지 않으면 링크 단계에서 `cannot find -lperl` 오류가 발생합니다. Perl 모듈이 필요 없으면 `config.inc` 에서 `PERL=0` 으로 비활성화하세요.
 
