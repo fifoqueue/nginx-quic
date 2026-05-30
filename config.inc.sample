@@ -6,7 +6,7 @@
 
 ### SERVER HEADER!!!
 ### Please edit this
-SERVER_HEADER="hakase"
+SERVER_HEADER="nginx"
 
 ### x86, x64 check
 ### If you do not want optimization, uncomment it.

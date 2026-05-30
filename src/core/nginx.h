@@ -11,10 +11,10 @@
 
 #define nginx_version      1031001
 #define NGINX_VERSION      "1.31.1"
-#define NGINX_VER          "nginx/" NGINX_VERSION " by Hakase"
+#define NGINX_VER          "nginx/" NGINX_VERSION
 
 #ifndef NGINX_SERVER
-#define NGINX_SERVER       "hakase"
+#define NGINX_SERVER       "nginx"
 #endif
 
 #define NGINX_SERVER_FULL  NGINX_SERVER "/" NGINX_VERSION
