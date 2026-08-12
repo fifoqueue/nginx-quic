@@ -21,7 +21,13 @@ if [ ! "$NGX_LOG" ]; then NGX_LOG="/var/log/nginx"; fi
 if [ ! "$NGX_PID" ]; then NGX_PID="/var/run/nginx.pid"; fi
 if [ ! "$NGX_LOCK" ]; then NGX_LOCK="/var/lock/nginx.lock"; fi
 if [ ! "$NGINX_PATCH_VERSION" ]; then NGINX_PATCH_VERSION="release-1.30.0"; fi
-if [ ! "$OPENSSL_VERSION" ]; then OPENSSL_VERSION="openssl-3.6.2"; fi
+if [ ! "$OPENSSL_VERSION" ]; then OPENSSL_VERSION="openssl-3.6.3"; fi
+if [ ! "$OPENSSL_PATCH_VERSION" ]; then
+    case "$OPENSSL_VERSION" in
+        openssl-3.6.3) OPENSSL_PATCH_VERSION="openssl-3.6.2" ;;
+        *) OPENSSL_PATCH_VERSION="$OPENSSL_VERSION" ;;
+    esac
+fi
 if [ ! "$HTTP_DEGRADATION" ]; then HTTP_DEGRADATION=1; fi
 if [ ! "$PERL" ]; then PERL=0; fi
 if [ ! "$DEBUG" ]; then DEBUG=0; fi
@@ -53,7 +59,7 @@ fi
 BUILD_OPENSSL_OPT="no-tests no-makedepend ${BUILD_OPENSSL_LTO}"
 
 ### nginx-ssl-fingerprint patches
-OPENSSL_PATCH_FILE="lib/nginx-ssl-fingerprint/patches/${OPENSSL_VERSION}.patch"
+OPENSSL_PATCH_FILE="lib/nginx-ssl-fingerprint/patches/${OPENSSL_PATCH_VERSION}.patch"
 
 if [ "$SSL_FINGERPRINT" = 1 ]; then
     NGINX_PATCH_FILE="lib/nginx-ssl-fingerprint/patches/${NGINX_PATCH_VERSION}.patch"

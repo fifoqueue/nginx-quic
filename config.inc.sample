@@ -30,7 +30,10 @@ DEBUG=0
 NGINX_PATCH_VERSION="release-1.30.0"
 
 ### OpenSSL source tag
-OPENSSL_VERSION="openssl-3.6.2"
+OPENSSL_VERSION="openssl-3.6.3"
+
+### Compatible patch tag from nginx-ssl-fingerprint/patches
+OPENSSL_PATCH_VERSION="openssl-3.6.2"
 
 #########################
 ### Select add module ###
