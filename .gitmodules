@@ -48,4 +48,4 @@
 	url = https://github.com/nginx-modules/ngx_cache_purge
 [submodule "lib/nginx-ssl-fingerprint"]
 	path = lib/nginx-ssl-fingerprint
-	url = https://github.com/phuslu/nginx-ssl-fingerprint.git
+	url = https://github.com/fifoqueue/nginx-ssl-fingerprint
