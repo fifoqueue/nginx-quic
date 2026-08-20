@@ -281,9 +281,7 @@ if [ "$LUA" = 1 ]; then
     rm -rf "${RESTY_TMP_DIR}"
   }
 
-  if [ ! -f "${LUA_LIB_DIR}/resty/core.lua" ]; then
-    install_lua_resty_module "https://github.com/openresty/lua-resty-core.git" "lua-resty-core"
-  fi
+  install_lua_resty_module "https://github.com/openresty/lua-resty-core.git" "lua-resty-core"
 
   if [ ! -f "${LUA_LIB_DIR}/resty/lrucache.lua" ]; then
     install_lua_resty_module "https://github.com/openresty/lua-resty-lrucache.git" "lua-resty-lrucache"
