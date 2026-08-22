@@ -84,6 +84,9 @@ CACHE_PURGE=1
 ### JA3/JA4 SSL fingerprint
 SSL_FINGERPRINT=1
 
+### TCP fingerprint
+TCP_FINGERPRINT=1
+
 ##########################
 ### nginx install path ###
 ##########################
