@@ -49,3 +49,6 @@
 [submodule "lib/nginx-ssl-fingerprint"]
 	path = lib/nginx-ssl-fingerprint
 	url = https://github.com/fifoqueue/nginx-ssl-fingerprint
+[submodule "lib/nginx-tcp-fingerprint"]
+	path = lib/nginx-tcp-fingerprint
+	url = https://github.com/fifoqueue/nginx-tcp-fingerprint
