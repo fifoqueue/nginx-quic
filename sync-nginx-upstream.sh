@@ -28,7 +28,7 @@ fi
 
 git fetch --tags "$remote" master
 
-read -r base < "$marker"
+base=$(tr -d '\r' < "$marker")
 git rev-parse --verify --quiet "$base^{commit}" >/dev/null || {
     echo "error: invalid commit in $marker: $base" >&2
     exit 1
