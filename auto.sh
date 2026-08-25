@@ -232,6 +232,7 @@ auto/configure \
 --with-stream_ssl_module \
 --with-stream_realip_module \
 --with-stream_ssl_preread_module \
+--with-http_json_module \
 --add-module=./lib/ngx_devel_kit \
 --add-module=./lib/ngx_brotli \
 --add-module=./lib/headers-more-nginx-module \
