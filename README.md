@@ -12,7 +12,7 @@ Original: [nginx](https://github.com/nginx/nginx)
 5. SSL Dynamic 적용
 6. JA3/JA4 SSL fingerprint 변수 지원 (`SSL_FINGERPRINT=1`)
 7. nginx-ssl-fingerprint용 nginx core/OpenSSL patch 자동 적용
-8. OpenSSL 3.6.2 정적 빌드
+8. OpenSSL 4.0.1 정적 빌드
 9. OpenResty lua-nginx-module 지원 (`LUA=1`)
 10. nginx 표준 선택 모듈 추가 활성화 (`HTTP_DEGRADATION=1`, `PERL=1`, select/poll event modules)
 
