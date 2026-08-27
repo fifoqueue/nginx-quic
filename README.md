@@ -5,27 +5,16 @@ Original: [nginx](https://github.com/nginx/nginx)
 
 ## 추가 내용
 
-1. ocsp file stapling 지원 (ssl_stapling on [http] 및 ssl_stapling_file [server] 사용 필요)
+1. OCSP file stapling 지원 (`ssl_stapling on;` 및 `ssl_stapling_file ...;` 설정)
 2. Server Header 지원 (config.inc 수정)
 3. SSL 설정의 일부 변경 (ciphers, prefer, session_timeout, early_data, ...)
 4. Cloudflare HPACK Patch 적용
 5. SSL Dynamic 적용
 6. JA3/JA4 SSL fingerprint 변수 지원 (`SSL_FINGERPRINT=1`)
 7. nginx-ssl-fingerprint용 nginx core/OpenSSL patch 자동 적용
-8. OpenSSL 4.0.1 정적 빌드
+8. OpenSSL 4.0.1 정적 빌드 (RSA/ECDSA 다중 인증서 및 PQC hybrid key exchange 검증)
 9. OpenResty lua-nginx-module 지원 (`LUA=1`)
 10. nginx 표준 선택 모듈 추가 활성화 (`HTTP_DEGRADATION=1`, `PERL=1`, select/poll event modules)
-
-## 미지원
-
-1. Hybrid 인증서 지원 여부 미검증
-2. OLD CHACHA20-POLY1305 미지원 (더 이상 쓸 일이 없음)
-3. strict_sni 기능은 nginx 자체 기능에서 지원되므로 추가 지원 X
-  - listen ssl 에 default_server 서버를 하나 만든 뒤에 ssl_reject_handshake on; 을 추가하세요.
-  - http 에 추가 할 경우 TLS 오류가 발생할 수 있습니다.
-  - strict_sni 처럼 http 안에서는 사용할 수 없습니다.
-4. OCSP Stapling 은 제대로 지원 되지 않을 수 있음.
-5. 기타 여러가지 버그가 아직 많을 수 있음.........
 
 ## Debian/Ubuntu 기반
 
