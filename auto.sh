@@ -21,10 +21,11 @@ if [ ! "$NGX_LOG" ]; then NGX_LOG="/var/log/nginx"; fi
 if [ ! "$NGX_PID" ]; then NGX_PID="/var/run/nginx.pid"; fi
 if [ ! "$NGX_LOCK" ]; then NGX_LOCK="/var/lock/nginx.lock"; fi
 if [ ! "$NGINX_PATCH_VERSION" ]; then NGINX_PATCH_VERSION="release-1.30.0"; fi
-if [ ! "$OPENSSL_VERSION" ]; then OPENSSL_VERSION="openssl-4.0.1"; fi
+if [ ! "$OPENSSL_VERSION" ]; then OPENSSL_VERSION="openssl-4.0.2"; fi
 if [ ! "$OPENSSL_PATCH_VERSION" ]; then
     case "$OPENSSL_VERSION" in
         openssl-3.6.3) OPENSSL_PATCH_VERSION="openssl-3.6.2" ;;
+        openssl-4.0.2) OPENSSL_PATCH_VERSION="openssl-4.0.1" ;;
         *) OPENSSL_PATCH_VERSION="$OPENSSL_VERSION" ;;
     esac
 fi
