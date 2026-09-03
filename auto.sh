@@ -82,6 +82,9 @@ if [ "$SSL_FINGERPRINT" = 1 ]; then
     fi
 fi
 
+### nginx hardening patch
+./nginx-clear-server-tokens-patch.sh || exit 1
+
 ### OpenSSL build
 case ./lib/openssl in
     /*) OPENSSL_PREFIX="./lib/openssl/.openssl" ;;
