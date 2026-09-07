@@ -15,6 +15,8 @@ Original: [nginx](https://github.com/nginx/nginx)
 8. OpenSSL 4.0.2 정적 빌드 (RSA/ECDSA 다중 인증서 및 PQC hybrid key exchange 검증)
 9. OpenResty lua-nginx-module 지원 (`LUA=1`)
 10. nginx 표준 선택 모듈 추가 활성화 (`HTTP_DEGRADATION=1`, `PERL=1`, select/poll event modules)
+11. Tengine의 요청 시작 시각 변수 `$request_start_time` 선별 이식
+12. 공통 크기 파서의 `g/G` 단위 지원 (Tengine 기반, 오버플로 검사 유지)
 
 ## Debian/Ubuntu 기반
 
