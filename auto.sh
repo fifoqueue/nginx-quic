@@ -73,12 +73,21 @@ if [ "$SSL_FINGERPRINT" = 1 ]; then
         patch --forward --fuzz=3 -d . -p1 < "$NGINX_PATCH_FILE" || exit 1
     fi
 
-    if ! grep -q "SSL_client_hello_get_ja_data" "lib/openssl/include/openssl/ssl.h.in"; then
-        if [ ! -f "$OPENSSL_PATCH_FILE" ]; then
-            echo "OpenSSL patch file not found: $OPENSSL_PATCH_FILE"
-            exit 1
-        fi
-        patch -d lib/openssl -p1 < "$OPENSSL_PATCH_FILE" || exit 1
+    # Read validated priority bytes without the removed RFC 7540 scheduler state.
+    sed -i \
+        -e 's/stream->fp_priority_dep = (uint32_t) depend;/stream->fp_priority_dep = ngx_http_v2_parse_sid(pos - 5);/' \
+        -e 's/stream->fp_priority_excl = (uint8_t) excl;/stream->fp_priority_excl = pos[-5] >> 7;/' \
+        -e 's/stream->fp_priority_weight = (uint8_t) (weight - 1);/stream->fp_priority_weight = pos[-1];/' \
+        src/http/v2/ngx_http_v2.c || exit 1
+
+    if [ ! -f "$OPENSSL_PATCH_FILE" ]; then
+        echo "OpenSSL patch file not found: $OPENSSL_PATCH_FILE"
+        exit 1
+    fi
+
+    if ! patch --dry-run --reverse --force --silent -d lib/openssl -p1 \
+        < "$OPENSSL_PATCH_FILE" >/dev/null 2>&1; then
+        patch --forward --batch -d lib/openssl -p1 < "$OPENSSL_PATCH_FILE" || exit 1
     fi
 fi
 

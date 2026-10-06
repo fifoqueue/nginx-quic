@@ -2011,41 +2011,6 @@ ngx_ssl_set_client_hello_callback(ngx_ssl_t *ssl, ngx_ssl_client_hello_arg *cb)
 
 #ifdef SSL_CLIENT_HELLO_SUCCESS
 
-ngx_int_t ngx_ssl_client_hello_get_ja_data(ngx_ssl_conn_t *ssl,
-    ngx_pool_t *pool, ngx_str_t *out, uint32_t *alpn_offset);
-
-
-static void
-ngx_ssl_client_hello_ja_cb(SSL *ssl)
-{
-    ngx_connection_t  *c;
-    ngx_str_t         *ja;
-
-    c = ngx_ssl_get_connection(ssl);
-
-    if (c == NULL || c->ssl == NULL) {
-        return;
-    }
-
-    c->ssl->fp_pool = c->pool;
-
-    ja = &c->ssl->fp_ja_data;
-    if (ja->data != NULL) {
-        return;
-    }
-
-    if (ngx_ssl_client_hello_get_ja_data(
-            ssl, c->pool, ja, &c->ssl->fp_alpn_offset)
-        != NGX_OK)
-    {
-        ngx_log_error(NGX_LOG_WARN, c->log, 0,
-                      "ngx_ssl_client_hello_get_ja_data() failed");
-        ja->data = NULL;
-        ja->len = 0;
-    }
-}
-
-
 int
 ngx_ssl_client_hello_callback(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
 {
@@ -2059,8 +2024,6 @@ ngx_ssl_client_hello_callback(ngx_ssl_conn_t *ssl_conn, int *ad, void *arg)
     c = ngx_ssl_get_connection(ssl_conn);
     cb = SSL_CTX_get_ex_data(c->ssl->session_ctx,
                              ngx_ssl_client_hello_arg_index);
-
-    ngx_ssl_client_hello_ja_cb(ssl_conn);
 
     if (SSL_client_hello_get0_ext(ssl_conn, TLSEXT_TYPE_server_name,
                                   (const unsigned char **) &p, &len)

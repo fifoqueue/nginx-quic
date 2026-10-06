@@ -1337,15 +1337,6 @@ ngx_http_v2_state_headers(ngx_http_v2_connection_t *h2c, u_char *pos,
                        stream->priority.effective.incremental);
     }
 
-    if (priority) {
-        stream->fp_priority_sid = (uint32_t) stream->node->id;
-        /* pos follows the five validated RFC 7540 priority bytes. */
-        stream->fp_priority_dep = ngx_http_v2_parse_sid(pos - 5);
-        stream->fp_priority_excl = pos[-5] >> 7;
-        stream->fp_priority_weight = pos[-1];
-        stream->fp_priority_set = 1;
-    }
-
     clcf = ngx_http_get_module_loc_conf(h2c->http_connection->conf_ctx,
                                         ngx_http_core_module);
 
@@ -1786,16 +1777,6 @@ ngx_http_v2_state_process_header(ngx_http_v2_connection_t *h2c, u_char *pos,
     }
 
     if (header->name.data[0] == ':') {
-        if (h2c->state.stream
-            && h2c->state.stream->fp_pseudoheaders_len
-               < sizeof(h2c->state.stream->fp_pseudoheaders)
-            && header->name.len > 1)
-        {
-            h2c->state.stream->fp_pseudoheaders[
-                h2c->state.stream->fp_pseudoheaders_len++
-            ] = header->name.data[1];
-        }
-
         rc = ngx_http_v2_pseudo_header(r, header);
 
         if (rc == NGX_OK) {
@@ -2276,9 +2257,8 @@ static u_char *
 ngx_http_v2_state_settings_params(ngx_http_v2_connection_t *h2c, u_char *pos,
     u_char *end)
 {
-    ngx_uint_t                   id, value;
-    ngx_http_v2_fp_setting_t    *setting;
-    ngx_http_v2_out_frame_t     *frame;
+    ngx_uint_t                id, value;
+    ngx_http_v2_out_frame_t  *frame;
 
     while (h2c->state.length) {
         if (end - pos < NGX_HTTP_V2_SETTINGS_PARAM_SIZE) {
@@ -2293,33 +2273,6 @@ ngx_http_v2_state_settings_params(ngx_http_v2_connection_t *h2c, u_char *pos,
 
         ngx_log_debug2(NGX_LOG_DEBUG_HTTP, h2c->connection->log, 0,
                        "http2 setting %ui:%ui", id, value);
-
-        if (h2c->fp_prefix.data == NULL) {
-            if (h2c->fp_settings.len < NGX_FP_V2_SETTINGS_INLINE) {
-                setting = &h2c->fp_settings.items[h2c->fp_settings.len];
-
-            } else {
-                if (h2c->fp_settings.overflow == NULL) {
-                    h2c->fp_settings.overflow = ngx_array_create(
-                        h2c->connection->pool, 4,
-                        sizeof(ngx_http_v2_fp_setting_t));
-                }
-                if (h2c->fp_settings.overflow == NULL) {
-                    return ngx_http_v2_connection_error(
-                        h2c, NGX_HTTP_V2_INTERNAL_ERROR);
-                }
-
-                setting = ngx_array_push(h2c->fp_settings.overflow);
-                if (setting == NULL) {
-                    return ngx_http_v2_connection_error(
-                        h2c, NGX_HTTP_V2_INTERNAL_ERROR);
-                }
-            }
-
-            setting->id = (uint16_t) id;
-            setting->value = (uint32_t) value;
-            h2c->fp_settings.len++;
-        }
 
         switch (id) {
 
@@ -2629,9 +2582,6 @@ ngx_http_v2_state_window_update(ngx_http_v2_connection_t *h2c, u_char *pos,
     }
 
     h2c->send_window += window;
-    if (h2c->fp_prefix.data == NULL) {
-        h2c->fp_windowupdate = window;
-    }
 
     while (!ngx_queue_empty(&h2c->waiting)) {
         q = ngx_queue_head(&h2c->waiting);

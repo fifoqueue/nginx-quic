@@ -82,12 +82,6 @@ typedef struct {
     ngx_http_v3_parse_varlen_int_t  vlint;
     ngx_http_v3_parse_field_section_prefix_t  prefix;
     ngx_http_v3_parse_field_rep_t   field_rep;
-    ngx_str_t                       fp_fingerprint;
-    ngx_str_t                       fp_fingerprint_hash;
-    ngx_str_t                       fp_fingerprint_normalized;
-    ngx_str_t                       fp_fingerprint_hash_normalized;
-    u_char                          fp_pseudoheaders[8];
-    uint8_t                         fp_pseudoheaders_len;
 } ngx_http_v3_parse_headers_t;
 
 

@@ -124,24 +124,6 @@ struct ngx_ssl_s {
 };
 
 
-typedef struct {
-    ngx_str_t                   alpn_str;
-    ngx_str_t                   quic_transport_params;
-    ngx_str_t                   quic_transport_params_str;
-    ngx_str_t                   quic_transport_params_normalized_str;
-    ngx_str_t                   quic_transport_params_raw_str;
-    size_t                      quic_initial_packet_size;
-    uint32_t                    quic_version;
-    uint32_t                    quic_original_version;
-    uint8_t                     quic_dcid_length;
-    uint8_t                     quic_scid_length;
-
-    unsigned                    alpn_done:1;
-    unsigned                    quic_retry:1;
-    unsigned                    quic_version_negotiated:1;
-} ngx_ssl_fingerprint_extra_t;
-
-
 struct ngx_ssl_connection_s {
     ngx_ssl_conn_t             *connection;
     SSL_CTX                    *session_ctx;
@@ -178,16 +160,6 @@ struct ngx_ssl_connection_s {
     unsigned                    early_preread:1;
     unsigned                    write_blocked:1;
     unsigned                    sni_accepted:1;
-
-    ngx_str_t                   fp_ja_data;
-    ngx_str_t                   fp_ja3_str;
-    ngx_str_t                   fp_ja3_hash;
-    ngx_str_t                   fp_ja4_str;
-    ngx_str_t                   fp_ja4_r_str;
-    uint32_t                    fp_alpn_offset;
-    uint16_t                    fp_tls_greased;
-    ngx_pool_t                 *fp_pool;
-    ngx_ssl_fingerprint_extra_t *fp_extra;
 
     ngx_ssl_dyn_rec_t           dyn_rec;
     ngx_msec_t                  dyn_rec_last_write;

@@ -17,8 +17,6 @@
 
 #define NGX_HTTP_V2_STATE_BUFFER_SIZE    16
 
-#define NGX_FP_V2_SETTINGS_INLINE        8
-
 #define NGX_HTTP_V2_DEFAULT_FRAME_SIZE   (1 << 14)
 #define NGX_HTTP_V2_MAX_FRAME_SIZE       ((1 << 24) - 1)
 
@@ -172,19 +170,6 @@ typedef struct {
 #endif
 
 
-typedef struct {
-    uint16_t    id;
-    uint32_t    value;
-} ngx_http_v2_fp_setting_t;
-
-
-typedef struct {
-    ngx_http_v2_fp_setting_t  items[NGX_FP_V2_SETTINGS_INLINE];
-    ngx_array_t              *overflow;
-    ngx_uint_t                len;
-} ngx_http_v2_fp_settings_t;
-
-
 struct ngx_http_v2_connection_s {
     ngx_connection_t                *connection;
     ngx_http_connection_t           *http_connection;
@@ -232,10 +217,6 @@ struct ngx_http_v2_connection_s {
     unsigned                         table_update:1;
     unsigned                         blocked:1;
     unsigned                         goaway:1;
-
-    ngx_http_v2_fp_settings_t        fp_settings;
-    ngx_uint_t                       fp_windowupdate;
-    ngx_str_t                        fp_prefix;
     unsigned                         indicate_resize:1;
 
 #if (NGX_HTTP_V2_HPACK_ENC)
@@ -290,14 +271,6 @@ struct ngx_http_v2_stream_s {
     unsigned                         initialized:1;
     unsigned                         waiting:1;
     unsigned                         blocked:1;
-
-    uint32_t                         fp_priority_sid;
-    uint32_t                         fp_priority_dep;
-    uint8_t                          fp_priority_excl;
-    uint8_t                          fp_priority_weight;
-    unsigned                         fp_priority_set:1;
-    u_char                           fp_pseudoheaders[8];
-    uint8_t                          fp_pseudoheaders_len;
     unsigned                         exhausted:1;
     unsigned                         in_closed:1;
     unsigned                         out_closed:1;
