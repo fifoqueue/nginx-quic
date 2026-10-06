@@ -1177,8 +1177,9 @@ static ngx_int_t
 ngx_http_v3_parse_control(ngx_connection_t *c, ngx_http_v3_parse_control_t *st,
     ngx_buf_t *b)
 {
-    ngx_buf_t  loc;
-    ngx_int_t  rc;
+    ngx_buf_t              loc;
+    ngx_int_t              rc;
+    ngx_http_v3_session_t  *h3c;
     enum {
         sw_start = 0,
         sw_first_type,
@@ -1253,6 +1254,10 @@ ngx_http_v3_parse_control(ngx_connection_t *c, ngx_http_v3_parse_control_t *st,
 
             st->length = st->vlint.value;
             if (st->length == 0) {
+                if (st->type == NGX_HTTP_V3_FRAME_SETTINGS) {
+                    h3c = ngx_http_v3_get_session(c);
+                    h3c->fp_settings_done = 1;
+                }
                 st->state = sw_type;
                 break;
             }
@@ -1288,6 +1293,8 @@ ngx_http_v3_parse_control(ngx_connection_t *c, ngx_http_v3_parse_control_t *st,
             }
 
             if (st->length == 0) {
+                h3c = ngx_http_v3_get_session(c);
+                h3c->fp_settings_done = 1;
                 st->state = sw_type;
             }
 
@@ -1311,7 +1318,9 @@ static ngx_int_t
 ngx_http_v3_parse_settings(ngx_connection_t *c,
     ngx_http_v3_parse_settings_t *st, ngx_buf_t *b)
 {
-    ngx_int_t  rc;
+    ngx_int_t                    rc;
+    ngx_http_v3_fp_setting_t    *setting;
+    ngx_http_v3_session_t       *h3c;
     enum {
         sw_start = 0,
         sw_id,
@@ -1352,6 +1361,35 @@ ngx_http_v3_parse_settings(ngx_connection_t *c,
             if (ngx_http_v3_set_param(c, st->id, st->vlint.value) != NGX_OK) {
                 return NGX_HTTP_V3_ERR_SETTINGS_ERROR;
             }
+
+            h3c = ngx_http_v3_get_session(c);
+            if (st->id == NGX_HTTP_V3_PARAM_MAX_TABLE_CAPACITY) {
+                h3c->fp_qpack_capacity = st->vlint.value;
+            } else if (st->id == NGX_HTTP_V3_PARAM_BLOCKED_STREAMS) {
+                h3c->fp_qpack_blocked = st->vlint.value;
+            }
+
+            if (h3c->fp_settings.len < NGX_HTTP_V3_FP_SETTINGS_INLINE) {
+                setting = &h3c->fp_settings.items[h3c->fp_settings.len];
+
+            } else {
+                if (h3c->fp_settings.overflow == NULL) {
+                    h3c->fp_settings.overflow = ngx_array_create(
+                        c->pool, 4, sizeof(ngx_http_v3_fp_setting_t));
+                }
+                if (h3c->fp_settings.overflow == NULL) {
+                    return NGX_ERROR;
+                }
+
+                setting = ngx_array_push(h3c->fp_settings.overflow);
+                if (setting == NULL) {
+                    return NGX_ERROR;
+                }
+            }
+
+            setting->id = st->id;
+            setting->value = st->vlint.value;
+            h3c->fp_settings.len++;
 
             goto done;
         }

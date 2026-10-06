@@ -53,6 +53,7 @@
 #define NGX_HTTP_V3_STREAM_SERVER_DECODER          5
 #define NGX_HTTP_V3_MAX_KNOWN_STREAM               6
 #define NGX_HTTP_V3_MAX_UNI_STREAMS                3
+#define NGX_HTTP_V3_FP_SETTINGS_INLINE             8
 
 /* HTTP/3 errors */
 #define NGX_HTTP_V3_ERR_NO_ERROR                   0x100
@@ -112,6 +113,19 @@ typedef struct {
 } ngx_http_v3_srv_conf_t;
 
 
+typedef struct {
+    uint64_t                      id;
+    uint64_t                      value;
+} ngx_http_v3_fp_setting_t;
+
+
+typedef struct {
+    ngx_http_v3_fp_setting_t      items[NGX_HTTP_V3_FP_SETTINGS_INLINE];
+    ngx_array_t                  *overflow;
+    ngx_uint_t                    len;
+} ngx_http_v3_fp_settings_t;
+
+
 struct ngx_http_v3_parse_s {
     size_t                        header_limit;
     ngx_http_v3_parse_headers_t   headers;
@@ -130,6 +144,13 @@ struct ngx_http_v3_session_s {
 
     ngx_queue_t                   blocked;
     ngx_uint_t                    nblocked;
+
+    ngx_http_v3_fp_settings_t     fp_settings;
+    uint64_t                      fp_qpack_capacity;
+    uint64_t                      fp_qpack_blocked;
+    ngx_str_t                     fp_settings_str;
+    ngx_str_t                     fp_qpack_str;
+    unsigned                      fp_settings_done:1;
 
     uint64_t                      next_request_id;
 

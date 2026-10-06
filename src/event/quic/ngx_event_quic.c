@@ -11,6 +11,10 @@
 #include <ngx_event_quic_connection.h>
 
 
+void ngx_ssl_quic_vn_record(ngx_connection_t *c, uint32_t version);
+ngx_flag_t ngx_ssl_quic_vn_match(ngx_connection_t *c, uint32_t *version);
+
+
 static ngx_quic_connection_t *ngx_quic_new_connection(ngx_connection_t *c,
     ngx_quic_conf_t *conf, ngx_quic_header_t *pkt);
 static ngx_int_t ngx_quic_handle_stateless_reset(ngx_connection_t *c,
@@ -875,6 +879,7 @@ ngx_quic_handle_packet(ngx_connection_t *c, ngx_quic_conf_t *conf,
     /* packet does not belong to a connection */
 
     if (rc == NGX_ABORT) {
+        ngx_ssl_quic_vn_record(c, pkt->version);
         return ngx_quic_negotiate_version(c, pkt);
     }
 
@@ -961,6 +966,7 @@ ngx_quic_handle_payload(ngx_connection_t *c, ngx_quic_header_t *pkt)
     ngx_int_t               rc;
     ngx_quic_send_ctx_t    *ctx;
     ngx_quic_connection_t  *qc;
+    ngx_ssl_fingerprint_extra_t  *fp;
     static u_char           buf[NGX_QUIC_MAX_UDP_PAYLOAD_SIZE];
 
     qc = ngx_quic_get_connection(c);
@@ -1015,6 +1021,24 @@ ngx_quic_handle_payload(ngx_connection_t *c, ngx_quic_header_t *pkt)
     if (c->ssl == NULL) {
         if (ngx_quic_init_connection(c) != NGX_OK) {
             return NGX_ERROR;
+        }
+    }
+
+    if (pkt->level == NGX_QUIC_ENCRYPTION_INITIAL) {
+        fp = c->ssl->fp_extra;
+        if (fp == NULL) {
+            fp = ngx_pcalloc(c->pool, sizeof(ngx_ssl_fingerprint_extra_t));
+            c->ssl->fp_extra = fp;
+        }
+
+        if (fp != NULL && fp->quic_version == 0) {
+            fp->quic_version = pkt->version;
+            fp->quic_initial_packet_size = pkt->raw->last - pkt->data;
+            fp->quic_dcid_length = (uint8_t) pkt->odcid.len;
+            fp->quic_scid_length = (uint8_t) pkt->scid.len;
+            fp->quic_retry = pkt->retried;
+            fp->quic_version_negotiated = ngx_ssl_quic_vn_match(
+                c, &fp->quic_original_version);
         }
     }
 

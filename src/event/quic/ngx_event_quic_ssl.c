@@ -18,6 +18,31 @@
 #define NGX_QUIC_MAX_BUFFERED    65535
 
 
+static ngx_inline void
+ngx_quic_save_transport_params(ngx_connection_t *c, const u_char *params,
+    size_t params_len)
+{
+    ngx_str_t  *fp;
+
+    if (c->ssl->fp_extra == NULL) {
+        return;
+    }
+
+    fp = &c->ssl->fp_extra->quic_transport_params;
+    if (fp->data != NULL || params_len == 0) {
+        return;
+    }
+
+    fp->data = ngx_pnalloc(c->pool, params_len);
+    if (fp->data == NULL) {
+        return;
+    }
+
+    ngx_memcpy(fp->data, params, params_len);
+    fp->len = params_len;
+}
+
+
 #if (NGX_QUIC_OPENSSL_API)
 
 static int ngx_quic_cbs_send(ngx_ssl_conn_t *ssl_conn,
@@ -280,6 +305,8 @@ ngx_quic_cbs_got_transport_params(ngx_ssl_conn_t *ssl_conn,
     p = (u_char *) params;
     end = p + params_len;
 
+    ngx_quic_save_transport_params(c, p, params_len);
+
     if (ngx_quic_parse_transport_params(p, end, &ctp, c->log) != NGX_OK) {
         qc->error = NGX_QUIC_ERR_TRANSPORT_PARAMETER_ERROR;
         qc->error_reason = "failed to process transport parameters";
@@ -531,6 +558,8 @@ ngx_quic_add_handshake_data(ngx_ssl_conn_t *ssl_conn,
 
         p = (u_char *) client_params;
         end = p + client_params_len;
+
+        ngx_quic_save_transport_params(c, p, client_params_len);
 
         /* defaults for parameters not sent by client */
         ngx_memcpy(&ctp, &qc->ctp, sizeof(ngx_quic_tp_t));
