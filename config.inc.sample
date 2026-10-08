@@ -30,10 +30,10 @@ DEBUG=0
 NGINX_PATCH_VERSION="release-1.31.3"
 
 ### OpenSSL source tag
-OPENSSL_VERSION="openssl-4.0.2"
+OPENSSL_VERSION="openssl-4.0.3"
 
 ### Compatible patch tag from nginx-ssl-fingerprint/patches
-OPENSSL_PATCH_VERSION="openssl-4.0.1"
+OPENSSL_PATCH_VERSION="openssl-4.0.3"
 
 #########################
 ### Select add module ###
@@ -83,9 +83,6 @@ CACHE_PURGE=1
 
 ### JA3/JA4 SSL fingerprint
 SSL_FINGERPRINT=1
-
-### TCP fingerprint
-TCP_FINGERPRINT=1
 
 ##########################
 ### nginx install path ###

@@ -21,7 +21,7 @@ if [ ! "$NGX_LOG" ]; then NGX_LOG="/var/log/nginx"; fi
 if [ ! "$NGX_PID" ]; then NGX_PID="/var/run/nginx.pid"; fi
 if [ ! "$NGX_LOCK" ]; then NGX_LOCK="/var/lock/nginx.lock"; fi
 if [ ! "$NGINX_PATCH_VERSION" ]; then NGINX_PATCH_VERSION="release-1.30.0"; fi
-if [ ! "$OPENSSL_VERSION" ]; then OPENSSL_VERSION="openssl-4.0.2"; fi
+if [ ! "$OPENSSL_VERSION" ]; then OPENSSL_VERSION="openssl-4.0.3"; fi
 if [ ! "$OPENSSL_PATCH_VERSION" ]; then
     case "$OPENSSL_VERSION" in
         openssl-3.6.3) OPENSSL_PATCH_VERSION="openssl-3.6.2" ;;
@@ -102,7 +102,9 @@ esac
 
 if [ ! -f "lib/openssl/.openssl/include/openssl/ssl.h" ] \
     || [ ! -f "lib/openssl/.openssl/lib/libssl.a" ] \
-    || [ ! -f "lib/openssl/.openssl/lib/libcrypto.a" ]; then
+    || [ ! -f "lib/openssl/.openssl/lib/libcrypto.a" ] \
+    || ! grep -Fqx "# define OPENSSL_VERSION_STR \"${OPENSSL_VERSION#openssl-}\"" \
+        "lib/openssl/.openssl/include/openssl/opensslv.h" 2>/dev/null; then
     (
         cd lib/openssl || exit 1
         if [ -f Makefile ]; then
@@ -192,7 +194,6 @@ if [ "$ZSTD" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/zstd
 if [ "$DYNAMIC_ETAG" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx_dynamic_etag"; fi
 if [ "$CACHE_PURGE" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx_cache_purge"; fi
 if [ "$SSL_FINGERPRINT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-ssl-fingerprint"; fi
-if [ "$TCP_FINGERPRINT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-tcp-fingerprint"; fi
 
 auto/configure \
 --with-cc-opt="-Wno-stringop-truncation ${BUILD_NAXSI_CC_OPT} -DTCP_FASTOPEN=23 ${BUILD_BIT}${BUILD_LTO} ${TEMP_OPT} -g -O3 -march=native -fstack-protector-strong --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wno-strict-aliasing -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -gsplit-dwarf -DNGX_HTTP_HEADERS" \
