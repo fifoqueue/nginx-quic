@@ -55,7 +55,8 @@ trap 'exit 1' HUP INT TERM
 
 git diff --binary --full-index "$base" "$target" > "$patch"
 cp "$(git rev-parse --git-path index)" "$index"
-GIT_INDEX_FILE=$index git apply --check --3way "$patch"
+# Detect conflicts in the temporary index without touching the worktree.
+GIT_INDEX_FILE=$index git apply --cached --3way "$patch"
 cp "$(git rev-parse --git-path index)" "$index"
 GIT_INDEX_FILE=$index git apply --3way "$patch"
 printf '%s\n' "$target" > "$marker"
