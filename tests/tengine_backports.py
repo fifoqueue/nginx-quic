@@ -26,8 +26,8 @@ with tempfile.TemporaryDirectory(prefix="nginx-tengine-") as directory:
     # Configuration parsing exercises ngx_conf_set_size_slot without allocating
     # the configured buffer.  Boundaries match the native binary's ssize_t.
     gib = 1024 ** 3
-    valid = ["0g", "1g", "1G", "1024m", str(sys.maxsize // gib) + "G"]
-    invalid = ["g", "-1g", "1.5g", "1gb", "1Gjunk",
+    valid = ["1g", "1G", "1024m", str(sys.maxsize // gib) + "G"]
+    invalid = ["0g", "g", "-1g", "1.5g", "1gb", "1Gjunk",
                str(sys.maxsize // gib + 1) + "G", str(sys.maxsize + 1)]
     for value in valid + invalid:
         config.write_text(common + " http { client_body_buffer_size "
@@ -35,7 +35,8 @@ with tempfile.TemporaryDirectory(prefix="nginx-tengine-") as directory:
         result = subprocess.run(command + ["-t"], capture_output=True, text=True)
         assert (result.returncode == 0) == (value in valid), (value, result.stderr)
         if value in invalid:
-            assert "invalid value" in result.stderr, result.stderr
+            assert ("invalid value" in result.stderr
+                    or "must be nonzero" in result.stderr), result.stderr
     print("PASS: size units, malformed values, and overflow boundaries", flush=True)
 
     config.write_text(common + r"""

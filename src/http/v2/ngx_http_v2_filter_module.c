@@ -475,7 +475,8 @@ ngx_http_v2_header_filter(ngx_http_request_t *r)
     } else {
         ngx_sprintf(pos + 8, "%O3ui", r->headers_out.status);
         pos = ngx_http_v2_write_header(h2c, pos, (u_char *)":status",
-                                       sizeof(":status") - 1, pos + 8, 3, tmp);
+                                       sizeof(":status") - 1, pos + 8, 3, tmp,
+                                       0);
     }
 
     if (r->headers_out.server == NULL) {
@@ -551,7 +552,7 @@ ngx_http_v2_header_filter(ngx_http_request_t *r)
         p = ngx_sprintf(pos + 15, "%O", r->headers_out.content_length_n);
         pos = ngx_http_v2_write_header(h2c, pos, (u_char *)"content-length",
                                        sizeof("content-length") - 1, pos + 15,
-                                       p - (pos + 15), tmp);
+                                       p - (pos + 15), tmp, 0);
     }
 
     if (r->headers_out.last_modified == NULL
@@ -561,11 +562,15 @@ ngx_http_v2_header_filter(ngx_http_request_t *r)
         len = sizeof("Wed, 31 Dec 1986 18:00:00 GMT") - 1;
         pos = ngx_http_v2_write_header(h2c, pos, (u_char *)"last-modified",
                                        sizeof("last-modified") - 1, pos + 14,
-                                       len, tmp);
+                                       len, tmp, 0);
     }
 
     if (r->headers_out.location && r->headers_out.location->value.len) {
-        pos = ngx_http_v2_write_header_tbl("location", r->headers_out.location->value);
+        pos = ngx_http_v2_write_header(h2c, pos, (u_char *)"location",
+                                       sizeof("location") - 1,
+                                       r->headers_out.location->value.data,
+                                       r->headers_out.location->value.len, tmp,
+                                       1);
     }
 
 #if (NGX_HTTP_GZIP)
@@ -595,7 +600,7 @@ ngx_http_v2_header_filter(ngx_http_request_t *r)
 
         pos = ngx_http_v2_write_header(h2c, pos, header[i].key.data,
                                        header[i].key.len, header[i].value.data,
-                                       header[i].value.len, tmp);
+                                       header[i].value.len, tmp, 1);
 
     }
 

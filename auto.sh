@@ -279,9 +279,14 @@ if [ "$LUA" = 1 ]; then
   install_lua_resty_module() {
     RESTY_REPO="$1"
     RESTY_DIR="$2"
+    RESTY_COMMIT="$3"
     RESTY_TMP_DIR=$(mktemp -d) || exit 1
 
-    git clone "$RESTY_REPO" "${RESTY_TMP_DIR}/${RESTY_DIR}" || {
+    git init -q "${RESTY_TMP_DIR}/${RESTY_DIR}" \
+      && git -C "${RESTY_TMP_DIR}/${RESTY_DIR}" fetch -q --depth=1 \
+        "$RESTY_REPO" "$RESTY_COMMIT" \
+      && git -C "${RESTY_TMP_DIR}/${RESTY_DIR}" checkout -q --detach \
+        "$RESTY_COMMIT" || {
       rm -rf "${RESTY_TMP_DIR}"
       exit 1
     }
@@ -297,10 +302,17 @@ if [ "$LUA" = 1 ]; then
     rm -rf "${RESTY_TMP_DIR}"
   }
 
-  install_lua_resty_module "https://github.com/openresty/lua-resty-core.git" "lua-resty-core"
+  # Keep executable build inputs pinned; update them with lua-nginx-module.
+  install_lua_resty_module \
+    "https://github.com/openresty/lua-resty-core.git" \
+    "lua-resty-core" \
+    "97ff492ea13f205b221359a636a784096afd2c81"
 
   if [ ! -f "${LUA_LIB_DIR}/resty/lrucache.lua" ]; then
-    install_lua_resty_module "https://github.com/openresty/lua-resty-lrucache.git" "lua-resty-lrucache"
+    install_lua_resty_module \
+      "https://github.com/openresty/lua-resty-lrucache.git" \
+      "lua-resty-lrucache" \
+      "ad373f457a091ffa85de984938f948bc1721d922"
   fi
 fi
 

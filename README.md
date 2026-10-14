@@ -7,7 +7,7 @@ Original: [nginx](https://github.com/nginx/nginx)
 
 1. OCSP file stapling 지원 (`ssl_stapling on;` 및 `ssl_stapling_file ...;` 설정)
 2. Server Header 지원 (config.inc 수정)
-3. SSL 설정의 일부 변경 (ciphers, prefer, session_timeout, early_data, ...)
+3. SSL 설정의 일부 변경 (ciphers, prefer, session_timeout, ...)
 4. Cloudflare HPACK Patch 적용
 5. SSL Dynamic 적용
 6. JA3/JA4 SSL fingerprint 변수 지원 (`SSL_FINGERPRINT=1`)

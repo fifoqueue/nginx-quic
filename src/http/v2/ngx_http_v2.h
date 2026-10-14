@@ -502,22 +502,22 @@ ngx_http_v2_write_int(u_char *pos, ngx_uint_t prefix, ngx_uint_t value);
 u_char *
 ngx_http_v2_write_header(ngx_http_v2_connection_t *h2c, u_char *pos,
     u_char *key, size_t key_len, u_char *value, size_t value_len,
-    u_char *tmp);
+    u_char *tmp, ngx_uint_t sensitive);
 
 void
 ngx_http_v2_table_resize(ngx_http_v2_connection_t *h2c);
 
 #define ngx_http_v2_write_header_str(key, value)                        \
     ngx_http_v2_write_header(h2c, pos, (u_char *) key, sizeof(key) - 1, \
-    (u_char *) value, sizeof(value) - 1, tmp);
+    (u_char *) value, sizeof(value) - 1, tmp, 0);
 
 #define ngx_http_v2_write_header_tbl(key, val)                          \
     ngx_http_v2_write_header(h2c, pos, (u_char *) key, sizeof(key) - 1, \
-    val.data, val.len, tmp);
+    val.data, val.len, tmp, 0);
 
 #define ngx_http_v2_write_header_pot(key, val)                          \
     ngx_http_v2_write_header(h2c, pos, (u_char *) key, sizeof(key) - 1, \
-    val->data, val->len, tmp);
+    val->data, val->len, tmp, 0);
 
 extern ngx_module_t  ngx_http_v2_module;
 

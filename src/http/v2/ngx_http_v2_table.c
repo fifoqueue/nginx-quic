@@ -537,13 +537,29 @@ u_char *
 ngx_http_v2_write_header(ngx_http_v2_connection_t *h2c, u_char *pos,
                          u_char *key, size_t key_len,
                          u_char *value, size_t value_len,
-                         u_char *tmp)
+                         u_char *tmp, ngx_uint_t sensitive)
 {
     ngx_int_t idx, header_idx;
 
     ngx_log_debug4(NGX_LOG_DEBUG_HTTP, h2c->connection->log, 0,
                    "http2 output header: %*s: %*s", key_len, key, value_len,
                    value);
+
+    if (sensitive) {
+        header_idx = hpack_get_static_index(h2c, key, key_len);
+
+        if (header_idx == NGX_ERROR) {
+            *pos++ = 16;
+            pos = ngx_http_v2_write_name(pos, key, key_len, tmp);
+
+        } else {
+            *pos = 16;
+            pos = ngx_http_v2_write_int(pos, ngx_http_v2_prefix(4),
+                                        header_idx);
+        }
+
+        return ngx_http_v2_write_value(pos, value, value_len, tmp);
+    }
 
     /* attempt to find the value in the dynamic table */
     idx = ngx_http_v2_table_encode_strings(h2c, key_len, value_len, key, value,
@@ -702,8 +718,6 @@ hpack_get_static_index(ngx_http_v2_connection_t *h2c, u_char *val, size_t len)
         [27-3] = 27,
     };
 
-    uint64_t pref;
-    size_t   save_len = len, i;
     int8_t   start;
 
     /* early exit for out of bounds lengths */
@@ -719,54 +733,12 @@ hpack_get_static_index(ngx_http_v2_connection_t *h2c, u_char *val, size_t len)
 
     header = &server_headers[start_at[len - 3]];
 
-    /* load first 8 bytes of key, for fast comparison */
-    if (len < 8) {
-        pref = 0;
-        if (len >= 4) {
-            pref = *(uint32_t *)(val + len - 4) | 0x20202020;
-            len -= 4;
-        }
-        while (len > 0) { /* 3 iterations at most */
-            pref = (pref << 8) ^ (val[len - 1] | 0x20);
-            len--;
-        }
-    } else {
-        pref = *(uint64_t *)val | 0x2020202020202020;
-        len -= 8;
-    }
-
-    /* iterate over headers with the right length */
-    while (header->len == save_len) {
-        /* quickly compare the first 8 bytes, most tests will end here */
-        if (pref != *(uint64_t *) header->val) {
-            header++;
-            continue;
-        }
-
-        if (len == 0) {
-            /* len == 0, indicates prefix held the entire key */
+    while (header->len == len) {
+        if (ngx_strncasecmp(val, (u_char *) header->val, len) == 0) {
             return header->idx;
         }
-        /* for longer keys compare the rest */
-        i = 1 + (save_len + 7) % 8; /* align so we can compare in quadwords */
 
-        while (i + 8 <= save_len) { /* 3 iterations at most */
-            if ( *(uint64_t *)&header->val[i]
-                 != (*(uint64_t *) &val[i]| 0x2020202020202020) )
-            {
-                header++;
-                i = 0;
-                break;
-            }
-            i += 8;
-        }
-
-        if (i == 0) {
-            continue;
-        }
-
-        /* found the corresponding entry in the static dictionary */
-        return header->idx;
+        header++;
     }
 
     return NGX_ERROR;
@@ -778,13 +750,13 @@ u_char *
 ngx_http_v2_write_header(ngx_http_v2_connection_t *h2c, u_char *pos,
                          u_char *key, size_t key_len,
                          u_char *value, size_t value_len,
-                         u_char *tmp)
+                         u_char *tmp, ngx_uint_t sensitive)
 {
     ngx_log_debug4(NGX_LOG_DEBUG_HTTP, h2c->connection->log, 0,
                    "http2 output header: %*s: %*s", key_len, key, value_len,
                    value);
 
-    *pos++ = 64;
+    *pos++ = sensitive ? 16 : 64;
     pos = ngx_http_v2_write_name(pos, key, key_len, tmp);
     pos = ngx_http_v2_write_value(pos, value, value_len, tmp);
 

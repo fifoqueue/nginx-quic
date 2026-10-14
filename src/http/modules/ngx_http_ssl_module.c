@@ -735,7 +735,7 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *cf, void *parent, void *child)
     ngx_conf_merge_value(conf->certificate_compression,
                          prev->certificate_compression, 0);
 
-    ngx_conf_merge_value(conf->early_data, prev->early_data, 1);
+    ngx_conf_merge_value(conf->early_data, prev->early_data, 0);
     ngx_conf_merge_value(conf->reject_handshake, prev->reject_handshake, 0);
 
     ngx_conf_merge_bitmask_value(conf->protocols, prev->protocols,
