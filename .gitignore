@@ -3,13 +3,14 @@ config.inc
 
 # Not needed
 /.hg
-/patches
+/patches/*
 
 # Patch ignore
 *~
 *.orig
 *.rej
 *.patch
+!/patches/nginx-http-flv-iocp.patch
 
 # Build files
 /objs

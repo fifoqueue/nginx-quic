@@ -1,0 +1,14 @@
+--- a/ngx_rtmp_auto_push_module.c
++++ b/ngx_rtmp_auto_push_module.c
+@@ -373,7 +373,10 @@
+ 
+             if (c) {
+                 if (c->read->active) {
+-                    if (!(ngx_event_flags & NGX_USE_IOCP_EVENT)) {
++#ifdef NGX_USE_IOCP_EVENT
++                    if (!(ngx_event_flags & NGX_USE_IOCP_EVENT))
++#endif
++                    {
+ 
+                         /*
+                          * delete the old accept events that were bound to

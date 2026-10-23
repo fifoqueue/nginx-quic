@@ -91,6 +91,16 @@ if [ "$SSL_FINGERPRINT" = 1 ]; then
     fi
 fi
 
+### shortcut: FLV IOCP compatibility; remove when the pinned module includes the fix.
+if [ "$FLV" = 1 ]; then
+    FLV_PATCH_FILE="patches/nginx-http-flv-iocp.patch"
+    if ! patch --dry-run --reverse --force --silent -d lib/nginx-http-flv-module -p1 \
+        < "$FLV_PATCH_FILE" >/dev/null 2>&1; then
+        patch --forward --batch -d lib/nginx-http-flv-module -p1 \
+            < "$FLV_PATCH_FILE" || exit 1
+    fi
+fi
+
 ### nginx hardening patch
 ./nginx-clear-server-tokens-patch.sh || exit 1
 
