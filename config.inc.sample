@@ -75,9 +75,6 @@ VTS=1
 ### zstd-nginx-module
 ZSTD=1
 
-### ngx_dynamic_etag
-DYNAMIC_ETAG=1
-
 ### ngx_cache_purge
 CACHE_PURGE=1
 

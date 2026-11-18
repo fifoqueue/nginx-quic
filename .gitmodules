@@ -40,9 +40,6 @@
 [submodule "lib/zlib-ng"]
 	path = lib/zlib-ng
 	url = https://github.com/zlib-ng/zlib-ng
-[submodule "lib/ngx_dynamic_etag"]
-	path = lib/ngx_dynamic_etag
-	url = https://github.com/dvershinin/ngx_dynamic_etag
 [submodule "lib/ngx_cache_purge"]
 	path = lib/ngx_cache_purge
 	url = https://github.com/nginx-modules/ngx_cache_purge

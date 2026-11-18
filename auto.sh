@@ -184,7 +184,6 @@ if [ "$FANCYINDEX" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./li
 if [ "$GEOIP2" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx_http_geoip2_module"; fi
 if [ "$VTS" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-module-vts"; fi
 if [ "$ZSTD" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/zstd-nginx-module"; fi
-if [ "$DYNAMIC_ETAG" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx_dynamic_etag"; fi
 if [ "$CACHE_PURGE" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/ngx_cache_purge"; fi
 if [ "$SSL_FINGERPRINT" = 1 ]; then BUILD_MODULES="${BUILD_MODULES} --add-module=./lib/nginx-ssl-fingerprint"; fi
 
